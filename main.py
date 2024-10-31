@@ -9,7 +9,8 @@ screen.setup(width=600, height=600)
 screen.tracer(0)
 
 player = Player()
-car = CarManager()
+car_manager = CarManager()
+scoreboard = Scoreboard()
 
 screen.listen()
 screen.onkey(player.move,"Up")
@@ -19,12 +20,22 @@ while game_is_on:
     time.sleep(0.1)
     screen.update()
     
-    car.create_car()  # Create a new car
-    car.move()    # Move all cars
+    car_manager.create_car()
+    car_manager.move()
     
-    # Remove cars that have moved off the screen
-    if car.xcor() < -320:  # Check if the car is off the screen
-        car.hideturtle()  # Optionally hide the car
-        car.remove(car)  # Remove from the list
+    #Detect collision with a car
+    for car in car_manager.all_cars:
+        if car.distance(player) < 20:
+            game_is_on = False
+            scoreboard.game_over()
     
-    player.restart()
+    #Detect successful crossing
+    if player.success():
+        player.restart()
+        car_manager.level_up()
+        scoreboard.increase_level()
+    
+    
+    
+screen.exitonclick()
+
